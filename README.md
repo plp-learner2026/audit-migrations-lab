@@ -58,3 +58,19 @@
 
 Change tracking, hierarchical data modelling, versioned migrations and least-privilege access control were all implemented and checked.
 
+
+
+\## Fix after feedback: sequence permissions (V4)
+
+\- Feedback: `app\_write` could not insert into tables with SERIAL columns, because it had no permission on the underlying sequences.
+
+\- Fix: added a new versioned migration, `V4\_\_sequence\_grants.sql`, instead of editing V1 to V3:
+
+&#x20; - `GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app\_write;`
+
+&#x20; - default privileges so future tables and sequences are covered too.
+
+\- Applied with Flyway: schema is now at version 4 (`flyway info` shows V1 to V4 as Success).
+
+\- Verified: `SET ROLE api; INSERT INTO categories (name, parent\_id) VALUES ('Tablets', 1);` succeeded.
+
